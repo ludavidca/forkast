@@ -1,0 +1,111 @@
+{
+  "citation_styles": [
+    {
+      "id": "apa_7",
+      "name": "APA (7th Edition)",
+      "f_string": "{authors} ({pub_date_formatted}). *{article_title}*. {site_name}. {url}",
+      "description": {
+        "general_rules": "Format: Author, A. A. (Year, Month Day). Title of work. Site Name. URL. The title of the article should be italicized (represented here by markdown asterisks). The site name is NOT italicized for website articles in APA 7.",
+        "author_rules": "List last name, then initials. Use '&' for multiple authors. If the author is an organization, use the full name.",
+        "missing_data_handling": {
+          "no_author": "Move the {article_title} to the front. Format: *{article_title}*. ({pub_date_formatted}). {site_name}. {url}",
+          "no_date": "Set {pub_date_formatted} to 'n.d.'",
+          "no_title": "Describe the work in square brackets [Description of work].",
+          "missing_site_name": "Omit if the site name is the same as the author."
+        }
+      },
+      "examples": [
+        "Smith, J. (2023, May 12). *The Future of AI*. TechDaily. https://techdaily.com/future-ai",
+        "National Geographic. (2022, January). *Ocean depth analysis*. National Geographic. https://natgeo.com/ocean",
+        "*Global Warming Trends*. (2021). Science Today. https://sciencetoday.com/trends",
+        "Doe, J., & Lee, K. (n.d.). *Understanding Python*. Coding World. https://codingworld.com/python",
+        "*Statistics on Coffee*. (n.d.). Coffee Data. https://coffeedata.org/stats"
+      ]
+    },
+    {
+      "id": "mla_9",
+      "name": "MLA (9th Edition)",
+      "f_string": "{authors}. \"{article_title}.\" *{site_name}*, {publisher}, {pub_date_formatted}, {url}.",
+      "description": {
+        "general_rules": "Format: Author. \"Title.\" Container (Site Name), Publisher, Date, URL. The Site Name should be italicized.",
+        "author_rules": "Last name, First name. If 3+ authors, use 'et al.'",
+        "missing_data_handling": {
+          "no_author": "Start with the \"{article_title}.\"",
+          "no_date": "Omit the date field entirely.",
+          "no_publisher": "Omit if the publisher name is essentially the same as the website title.",
+          "access_date": "MLA 9 only requires an access date if the web page has no publication date or might change. If used, append 'Accessed {access_date_formatted}.' at the end."
+        }
+      },
+      "examples": [
+        "Smith, John. \"The Future of AI.\" *TechDaily*, Tech Media Group, 12 May 2023, https://techdaily.com/future-ai.",
+        "\"Global Warming Trends.\" *Science Today*, 2021, https://sciencetoday.com/trends.",
+        "Doe, Jane, et al. \"Understanding Python.\" *Coding World*, https://codingworld.com/python.",
+        "NASA. \"Mars Rover Update.\" *NASA*, 14 June 2022, https://nasa.gov/rover.",
+        "\"Coffee Statistics.\" *Coffee Data*, n.d., https://coffeedata.org/stats. Accessed 14 Dec. 2025."
+      ]
+    },
+    {
+      "id": "chicago_17",
+      "name": "Chicago (17th Ed. Notes & Bibliography)",
+      "f_string": "{authors}. \"{article_title}.\" {site_name}. {pub_date_formatted}. {url}.",
+      "description": {
+        "general_rules": "Bibliography Format: Last, First. \"Title.\" Site Name. Month Day, Year. URL.",
+        "author_rules": "First author is Last, First. Subsequent authors are First Last.",
+        "missing_data_handling": {
+          "no_author": "Start with \"{site_name}\" or the \"{article_title}\".",
+          "no_date": "Use the access date instead. Format: Accessed Month Day, Year.",
+          "corporate_author": "Treat the organization as the author."
+        }
+      },
+      "examples": [
+        "Smith, John. \"The Future of AI.\" TechDaily. May 12, 2023. https://techdaily.com/future-ai.",
+        "TechDaily. \"The Future of AI.\" May 12, 2023. https://techdaily.com/future-ai.",
+        "\"Global Warming Trends.\" Science Today. 2021. https://sciencetoday.com/trends.",
+        "Doe, Jane. \"Understanding Python.\" Coding World. Accessed December 14, 2025. https://codingworld.com/python.",
+        "National Geographic. \"Ocean Depth Analysis.\" January 2022. https://natgeo.com/ocean."
+      ]
+    },
+    {
+      "id": "ieee",
+      "name": "IEEE",
+      "f_string": "{authors}, \"{article_title},\" *{site_name}*. {url} (accessed {access_date_formatted}).",
+      "description": {
+        "general_rules": "Format: Initial. Last Name, \"Title,\" Website. URL (accessed Date). Note that IEEE usually uses numbered citations [1], but this string generates the bibliography entry.",
+        "author_rules": "Initials then Last Name (e.g., J. Smith).",
+        "missing_data_handling": {
+          "no_author": "Start with \"{article_title}.\"",
+          "no_date": "IEEE website citations focus heavily on the Accessed date, publication date is often omitted for websites unless it is a formal article.",
+          "abbreviations": "Use standard abbreviations for months (Jan., Feb., etc)."
+        }
+      },
+      "examples": [
+        "J. Smith, \"The Future of AI,\" *TechDaily*. https://techdaily.com/future-ai (accessed May 12, 2023).",
+        "\"Global Warming Trends,\" *Science Today*. https://sciencetoday.com/trends (accessed Dec. 14, 2025).",
+        "J. Doe and K. Lee, \"Understanding Python,\" *Coding World*. https://codingworld.com/python (accessed Nov. 10, 2024).",
+        "NASA, \"Mars Rover Update,\" *NASA*. https://nasa.gov/rover (accessed June 14, 2022).",
+        "\"Statistics on Coffee,\" *Coffee Data*. https://coffeedata.org/stats (accessed Jan. 1, 2024)."
+      ]
+    },
+    {
+      "id": "harvard",
+      "name": "Harvard",
+      "f_string": "{authors} ({pub_year}) '{article_title}', *{site_name}*. Available at: {url} (Accessed: {access_date_formatted}).",
+      "description": {
+        "general_rules": "Format: Author (Year) 'Title', Site Name. Available at: URL (Accessed: Date). Title is in single quotes. Site Name is italicized.",
+        "author_rules": "Last name, Initial(s). No full stops after initials in some variations, but generally Last, I.",
+        "missing_data_handling": {
+          "no_author": "Use the {site_name} or organization as the author. If that fails, use the title.",
+          "no_date": "Use (no date) or (n.d.).",
+          "access_date": "Mandatory for all website citations."
+        }
+      },
+      "examples": [
+        "Smith, J. (2023) 'The Future of AI', *TechDaily*. Available at: https://techdaily.com/future-ai (Accessed: 12 May 2023).",
+        "Science Today (2021) 'Global Warming Trends', *Science Today*. Available at: https://sciencetoday.com/trends (Accessed: 14 December 2025).",
+        "Doe, J. and Lee, K. (no date) 'Understanding Python', *Coding World*. Available at: https://codingworld.com/python (Accessed: 10 November 2024).",
+        "NASA (2022) 'Mars Rover Update', *NASA*. Available at: https://nasa.gov/rover (Accessed: 14 June 2022).",
+        "Coffee Data (no date) 'Statistics on Coffee', *Coffee Data*. Available at: https://coffeedata.org/stats (Accessed: 1 January 2024)."
+      ]
+    }
+  ]
+}
