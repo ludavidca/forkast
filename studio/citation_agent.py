@@ -1,19 +1,19 @@
+import os
+from pathlib import Path
 from typing import List, TypedDict, Literal, Optional
+from datetime import datetime
 from langgraph.graph import StateGraph, START, END
-from bs4 import BeautifulSoup
-import requests
+from trafilatura import fetch_url, extract
 import json
 from together import Together
 from pydantic import BaseModel, Field
 from IPython.display import Image, display
-from pathlib import Path
 
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
-load_dotenv('../studio/.env')
-
 script_dir = Path.cwd().parent
+load_dotenv('../studio/.env')
 
 model = ChatOpenAI(model="gpt-4o", temperature=0) 
 client = Together()
@@ -43,20 +43,18 @@ class CitationData(BaseModel):
         description="The publication date formatted for the citation style (e.g., '2023, May 12')"
     )
 
-class State(TypedDict):
+class State(BaseModel):
     citation_style: Literal['apa_7', 'mla_9', 'chicago_17', 'ieee', 'harvard']
     url: str
-    date_accessed: str
-    raw_website_output: Optional[str]
-    citation_data: Optional[CitationData]
-    finalized_citation:Optional[str]
-
+    raw_website_output: Optional[str] = None
+    citation_data: Optional[CitationData] = None
+    finalized_citation: Optional[str] = None
+    date_accessed: Optional[str] = datetime.now().strftime("%Y-%m-%d")
 
 def get_website_data(state: State):
-    response = requests.get(state["url"])
-    soup = BeautifulSoup(response.content, 'html.parser')
-    text = soup.get_text(separator='\n', strip=True)
-    return {"raw_website_output": text}
+    downloaded = fetch_url(state.url)
+    result = extract(downloaded, with_metadata=True)
+    return {"raw_website_output": result}
 
 
 def extract_citation_data(state: State):
@@ -64,11 +62,10 @@ def extract_citation_data(state: State):
     with open(prompt_path, 'r') as f:
         prompt = f.read()
     
-    prompt = prompt.format(extracted_website_data=state["raw_website_output"], json_format=str(json.dumps(CitationData.model_json_schema())))
-
+    formatted_prompt = prompt.format(extracted_website_data=state.raw_website_output, json_format=str(json.dumps(CitationData.model_json_schema())))
     response = client.chat.completions.create(
         messages=[
-            {"role": "system", "content": prompt},
+            {"role": "system", "content": formatted_prompt},
         ],
         model="Qwen/Qwen3-Next-80B-A3B-Instruct",
         response_format={
@@ -77,8 +74,6 @@ def extract_citation_data(state: State):
         },
     )
     output = json.loads(response.choices[0].message.content)
-    print(json.dumps(output, indent=2))
-
     return {"citation_data": output}
 
 def finalize_citation(state: State):
@@ -86,28 +81,27 @@ def finalize_citation(state: State):
     with open(citation_styles_path, 'r') as f:
         json_data = json.load(f)
     citation_styles = json_data["citation_styles"]
-    citation_style_data = json.dumps(next((style for style in citation_styles if style["id"] == state["citation_style"]), None))
+    citation_style_data = json.dumps(next((style for style in citation_styles if style["id"] == state.citation_style), None))
 
     prompt_path = script_dir / "prompts" / "finalize_citation.txt"
 
     with open(prompt_path, 'r') as f:
         prompt = f.read()
     
-    prompt = prompt.format(
-        citation_style_data=citation_style_data,
-        citation_data=state["citation_data"],
-        url=state["url"],
-        date_accessed=state["date_accessed"],
+    formatted_prompt = prompt.format(
+        citation_style_guide=citation_style_data,
+        citation_data=state.citation_data,
+        url=state.url,
+        date_accessed=state.date_accessed,
     )
 
     response = client.chat.completions.create(
         messages=[
-            {"role": "system", "content": prompt},
+            {"role": "system", "content": formatted_prompt},
         ],
         model="Qwen/Qwen3-Next-80B-A3B-Instruct")
     
     return {"finalized_citation": response.choices[0].message.content}
-    
     
 workflow = StateGraph(State)
 workflow.add_node("get_websites_data", get_website_data)
@@ -121,5 +115,3 @@ workflow.add_edge("finalize_citation", END)
 
 
 graph = workflow.compile()
-
-display(Image(graph.get_graph().draw_mermaid_png()))

@@ -38,3 +38,6 @@ next-env.d.ts
 
 studio/.langgraph_api
 */__pycache__
+
+*/temp.ipynb
+*/temp.py
